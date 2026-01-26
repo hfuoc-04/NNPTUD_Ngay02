@@ -1,0 +1,64 @@
+{
+  "$schema": "./node_modules/json-server/schema.json",
+  "posts": [
+    {
+      "id": "1",
+      "title": "a title",
+      "views": 100
+    },
+    {
+      "id": "2",
+      "title": "another title",
+      "views": 200
+    },
+    {
+      "title": "fuoc2",
+      "views": 565,
+      "id": "3"
+    },
+    {
+      "id": "4",
+      "title": "fuoc1",
+      "views": 4561
+    },
+    {
+      "id": "5",
+      "title": "pahtfhbfv",
+      "views": 50,
+      "isDeleted": false
+    },
+    {
+      "id": "6",
+      "title": "giat gan",
+      "views": 4,
+      "isDeleted": false
+    }
+  ],
+  "comments": [
+    {
+      "id": "1",
+      "text": "a comment about post 1",
+      "postId": "1"
+    },
+    {
+      "id": "2",
+      "text": "another comment about post 1",
+      "postId": "1"
+    },
+    {
+      "id": "3",
+      "text": "dbhfhbvf",
+      "postId": "3",
+      "isDeleted": false
+    },
+    {
+      "id": "4",
+      "text": "fuoc",
+      "postId": "4",
+      "isDeleted": false
+    }
+  ],
+  "profile": {
+    "name": "typicode"
+  }
+}

@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Bài Viết & Bình Luận (Blue/Black Theme)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-body: #050505;
+            --bg-card: #0f1115;
+            --primary-blue: #2563eb;
+            --primary-glow: #3b82f6;
+            --text-main: #e2e8f0;
+            --text-muted: #64748b;
+            --border-color: #1e293b;
+            --danger: #ef4444;
+            --success: #10b981;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            background-color: var(--bg-body);
+            background-image: radial-gradient(circle at 50% 0%, #1e3a8a 0%, transparent 50%);
+            color: var(--text-main);
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(to right, #3b82f6, #60a5fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(37, 99, 235, 0.3);
+        }
+
+        .header p {
+            color: var(--text-muted);
+        }
+
+        /* Card Styles */
+        .glass-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #fff;
+            border-left: 4px solid var(--primary-blue);
+            padding-left: 12px;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .tab-btn.active {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 15px rgba(37, 99, 235, 0.4);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Forms */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            background: #000;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: white;
+            font-family: inherit;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--primary-blue);
+            color: white;
+            margin-top: 16px;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+            box-shadow: 0 0 15px rgba(37, 99, 235, 0.4);
+        }
+
+        .btn-edit { background: #0ea5e9; color: white; padding: 6px 12px; font-size: 0.8rem; }
+        .btn-delete { background: #ef4444; color: white; padding: 6px 12px; font-size: 0.8rem; }
+        .btn-restore { background: #10b981; color: white; padding: 6px 12px; font-size: 0.8rem; }
+
+        /* Table */
+        .table-container {
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #1e293b;
+            padding: 14px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        td {
+            padding: 14px;
+            border-bottom: 1px solid var(--border-color);
+            color: #e2e8f0;
+        }
+
+        /* Yêu cầu: Hiển thị xóa mềm (Gạch ngang) */
+        tr.deleted td {
+            text-decoration: line-through;
+            color: #475569;
+            opacity: 0.7;
+        }
+
+        /* Ngoại trừ cột hành động thì không gạch ngang để còn bấm nút */
+        tr.deleted td:last-child {
+            text-decoration: none;
+            opacity: 1;
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-active { background: rgba(16, 185, 129, 0.1); color: #34d399; }
+        .status-deleted { background: rgba(239, 68, 68, 0.1); color: #f87171; }
+
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-glow);
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background: #111;
+            border: 1px solid #333;
+            width: 90%; max-width: 500px;
+            margin: 10% auto;
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+        }
+
+        .modal-actions {
+            margin-top: 20px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .btn-cancel {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>QUẢN LÝ NỘI DUNG</h1>
+            <p>Hệ thống quản lý Post & Comment (Soft Delete - ID String)</p>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('posts')">QUẢN LÝ BÀI VIẾT</button>
+            <button class="tab-btn" onclick="switchTab('comments')">QUẢN LÝ BÌNH LUẬN</button>
+        </div>
+
+        <!-- POSTS SECTION -->
+        <div id="postsTab" class="tab-content active">
+            <!-- Thống kê -->
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-number" id="postTotal">0</div>
+                    <div class="stat-label">Tổng bài viết</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="postActive">0</div>
+                    <div class="stat-label">Đang hiển thị</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="postDeleted">0</div>
+                    <div class="stat-label">Đã xóa mềm</div>
+                </div>
+            </div>
+
+            <!-- Form thêm mới -->
+            <div class="glass-card">
+                <h2 class="card-title">Thêm Bài Viết Mới</h2>
+                <form id="postForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Tiêu đề bài viết</label>
+                            <input type="text" id="postTitle" placeholder="Nhập tiêu đề..." required>
+                        </div>
+                        <div class="form-group">
+                            <label>Lượt xem ban đầu</label>
+                            <input type="number" id="postViews" placeholder="0" value="0">
+                        </div>
+                    </div>
+                    <!-- ID sẽ tự sinh trong code -->
+                    <button type="submit" class="btn btn-primary">Thêm Bài Viết</button>
+                </form>
+            </div>
+
+            <!-- Danh sách -->
+            <div class="glass-card">
+                <h2 class="card-title">Danh Sách Bài Viết</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID (String)</th>
+                                <th>Tiêu Đề</th>
+                                <th>Views</th>
+                                <th>Trạng Thái</th>
+                                <th>Hành Động</th>
+                            </tr>
+                        </thead>
+                        <tbody id="postTableBody">
+                            <!-- JS will render here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- COMMENTS SECTION -->
+        <div id="commentsTab" class="tab-content">
+             <!-- Thống kê Comments -->
+             <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-number" id="commentTotal">0</div>
+                    <div class="stat-label">Tổng bình luận</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="commentActive">0</div>
+                    <div class="stat-label">Đang hiển thị</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="commentDeleted">0</div>
+                    <div class="stat-label">Đã xóa mềm</div>
+                </div>
+            </div>
+
+            <!-- Form thêm bình luận -->
+            <div class="glass-card">
+                <h2 class="card-title">Thêm Bình Luận Mới</h2>
+                <form id="commentForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Chọn Bài Viết</label>
+                            <select id="commentPostSelect" required>
+                                <option value="">-- Chọn bài viết --</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Nội dung bình luận</label>
+                            <input type="text" id="commentText" placeholder="Nhập nội dung..." required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Thêm Bình Luận</button>
+                </form>
+            </div>
+
+            <!-- Danh sách bình luận -->
+            <div class="glass-card">
+                <h2 class="card-title">Danh Sách Bình Luận</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID (String)</th>
+                                <th>Nội Dung</th>
+                                <th>Thuộc Bài Viết (ID)</th>
+                                <th>Trạng Thái</th>
+                                <th>Hành Động</th>
+                            </tr>
+                        </thead>
+                        <tbody id="commentTableBody">
+                            <!-- JS Render -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Edit Post -->
+    <div id="editPostModal" class="modal">
+        <div class="modal-content">
+            <h2 class="card-title">Sửa Bài Viết</h2>
+            <input type="hidden" id="editPostId">
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label>Tiêu đề</label>
+                <input type="text" id="editPostTitle">
+            </div>
+            <div class="form-group">
+                <label>Views</label>
+                <input type="number" id="editPostViews">
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-cancel" onclick="closeModal('editPostModal')">Hủy</button>
+                <button class="btn btn-primary" onclick="submitEditPost()">Lưu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Edit Comment -->
+    <div id="editCommentModal" class="modal">
+        <div class="modal-content">
+            <h2 class="card-title">Sửa Bình Luận</h2>
+            <input type="hidden" id="editCommentId">
+            <div class="form-group">
+                <label>Nội dung</label>
+                <input type="text" id="editCommentText">
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-cancel" onclick="closeModal('editCommentModal')">Hủy</button>
+                <button class="btn btn-primary" onclick="submitEditComment()">Lưu</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // CẤU HÌNH API
+        const API_URL = "http://localhost:3000";
+        
+        // --- UTILS ---
+        
+        // Yêu cầu: ID tự tăng bằng maxId + 1, lưu là CHUỖI
+        function generateId(list) {
+            if (!list || list.length === 0) return "1";
+            // Tìm max ID (chuyển về số để so sánh)
+            const maxId = list.reduce((max, item) => {
+                const currentId = parseInt(item.id);
+                return currentId > max ? currentId : max;
+            }, 0);
+            return (maxId + 1).toString(); // Chuyển thành chuỗi
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById(tabName + 'Tab').classList.add('active');
+            document.querySelector(`button[onclick="switchTab('${tabName}')"]`).classList.add('active');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+        // --- POSTS LOGIC ---
+        let postsData = [];
+
+        async function fetchPosts() {
+            try {
+                const res = await fetch(`${API_URL}/posts`);
+                postsData = await res.json();
+                renderPosts();
+                renderStats('post', postsData);
+                updatePostSelect(); // Cập nhật dropdown cho comment
+            } catch (err) {
+                console.error("Lỗi fetch posts:", err);
+            }
+        }
+
+        function renderPosts() {
+            const tbody = document.getElementById('postTableBody');
+            tbody.innerHTML = '';
+
+            postsData.forEach(post => {
+                const isDeleted = post.isDeleted === true; // Kiểm tra soft delete
+                const tr = document.createElement('tr');
+                
+                // Yêu cầu: Sử dụng gạch ngang cho post xóa mềm (class .deleted)
+                if (isDeleted) tr.classList.add('deleted');
+
+                tr.innerHTML = `
+                    <td>${post.id}</td>
+                    <td>${post.title}</td>
+                    <td>${post.views}</td>
+                    <td>
+                        <span class="status-badge ${isDeleted ? 'status-deleted' : 'status-active'}">
+                            ${isDeleted ? 'Đã xóa' : 'Hiển thị'}
+                        </span>
+                    </td>
+                    <td>
+                        ${!isDeleted 
+                            ? `<button class="btn btn-edit" onclick="openEditPost('${post.id}')">Sửa</button>
+                               <button class="btn btn-delete" onclick="softDeletePost('${post.id}')">Xóa</button>`
+                            : `<button class="btn btn-restore" onclick="restorePost('${post.id}')">Khôi phục</button>`
+                        }
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Yêu cầu: Thêm isDeleted: true vào object khi tạo (mặc định false)
+        document.getElementById('postForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title = document.getElementById('postTitle').value;
+            const views = document.getElementById('postViews').value;
+
+            // Tính ID mới
+            const newId = generateId(postsData);
+
+            const newPost = {
+                id: newId, 
+                title: title,
+                views: parseInt(views),
+                isDeleted: false // Mặc định chưa xóa
+            };
+
+            await fetch(`${API_URL}/posts`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newPost)
+            });
+
+            document.getElementById('postForm').reset();
+            fetchPosts();
+        });
+
+        // Yêu cầu: Xoá cứng chuyển thành xoá mềm (isDeleted: true)
+        async function softDeletePost(id) {
+            if(!confirm("Bạn có chắc muốn xóa bài viết này không?")) return;
+            
+            await fetch(`${API_URL}/posts/${id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ isDeleted: true })
+            });
+            fetchPosts();
+        }
+
+        // Khôi phục bài viết
+        async function restorePost(id) {
+            await fetch(`${API_URL}/posts/${id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ isDeleted: false })
+            });
+            fetchPosts();
+        }
+
+        // Sửa bài viết
+        function openEditPost(id) {
+            const post = postsData.find(p => p.id === id);
+            if(post) {
+                document.getElementById('editPostId').value = post.id;
+                document.getElementById('editPostTitle').value = post.title;
+                document.getElementById('editPostViews').value = post.views;
+                document.getElementById('editPostModal').style.display = 'block';
+            }
+        }
+
+        async function submitEditPost() {
+            const id = document.getElementById('editPostId').value;
+            const title = document.getElementById('editPostTitle').value;
+            const views = document.getElementById('editPostViews').value;
+
+            await fetch(`${API_URL}/posts/${id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title, views: parseInt(views) })
+            });
+            
+            closeModal('editPostModal');
+            fetchPosts();
+        }
+
+        // --- COMMENTS LOGIC (Yêu cầu: Thực hiện toàn bộ thao tác với comments) ---
+        let commentsData = [];
+
+        async function fetchComments() {
+            try {
+                const res = await fetch(`${API_URL}/comments`);
+                commentsData = await res.json();
+                renderComments();
+                renderStats('comment', commentsData);
+            } catch (err) { console.error(err); }
+        }
+
+        function renderComments() {
+            const tbody = document.getElementById('commentTableBody');
+            tbody.innerHTML = '';
+            
+            commentsData.forEach(cmt => {
+                const isDeleted = cmt.isDeleted === true;
+                const tr = document.createElement('tr');
+                if(isDeleted) tr.classList.add('deleted');
+
+                tr.innerHTML = `
+                    <td>${cmt.id}</td>
+                    <td>${cmt.text}</td>
+                    <td>${cmt.postId}</td>
+                    <td>
+                         <span class="status-badge ${isDeleted ? 'status-deleted' : 'status-active'}">
+                            ${isDeleted ? 'Đã xóa' : 'Hiển thị'}
+                        </span>
+                    </td>
+                    <td>
+                        ${!isDeleted 
+                            ? `<button class="btn btn-edit" onclick="openEditComment('${cmt.id}')">Sửa</button>
+                               <button class="btn btn-delete" onclick="softDeleteComment('${cmt.id}')">Xóa</button>`
+                            : `<button class="btn btn-restore" onclick="restoreComment('${cmt.id}')">Khôi phục</button>`
+                        }
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Cập nhật dropdown chọn bài viết cho form comment
+        function updatePostSelect() {
+            const select = document.getElementById('commentPostSelect');
+            // Chỉ lấy những bài viết chưa bị xóa
+            const activePosts = postsData.filter(p => !p.isDeleted);
+            
+            select.innerHTML = '<option value="">-- Chọn bài viết --</option>';
+            activePosts.forEach(p => {
+                select.innerHTML += `<option value="${p.id}">[ID: ${p.id}] ${p.title}</option>`;
+            });
+        }
+
+        // Thêm Comment mới (Có Soft Delete field + ID string)
+        document.getElementById('commentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const postId = document.getElementById('commentPostSelect').value;
+            const text = document.getElementById('commentText').value;
+
+            if(!postId) return alert("Vui lòng chọn bài viết!");
+
+            const newId = generateId(commentsData);
+
+            const newComment = {
+                id: newId,
+                postId: postId,
+                text: text,
+                isDeleted: false
+            };
+
+            await fetch(`${API_URL}/comments`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newComment)
+            });
+
+            document.getElementById('commentForm').reset();
+            fetchComments();
+        });
+
+        // Xóa mềm Comment
+        async function softDeleteComment(id) {
+            if(!confirm("Xóa bình luận này?")) return;
+            await fetch(`${API_URL}/comments/${id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ isDeleted: true })
+            });
+            fetchComments();
+        }
+
+        // Khôi phục Comment
+        async function restoreComment(id) {
+            await fetch(`${API_URL}/comments/${id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ isDeleted: false })
+            });
+            fetchComments();
+        }
+
+        // Sửa Comment
+        function openEditComment(id) {
+            const cmt = commentsData.find(c => c.id === id);
+            if(cmt) {
+                document.getElementById('editCommentId').value = cmt.id;
+                document.getElementById('editCommentText').value = cmt.text;
+                document.getElementById('editCommentModal').style.display = 'block';
+            }
+        }
+
+        async function submitEditComment() {
+            const id = document.getElementById('editCommentId').value;
+            const text = document.getElementById('editCommentText').value;
+
+            await fetch(`${API_URL}/comments/${id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text })
+            });
+            
+            closeModal('editCommentModal');
+            fetchComments();
+        }
+
+        // Thống kê chung
+        function renderStats(type, data) {
+            const total = data.length;
+            const deleted = data.filter(i => i.isDeleted).length;
+            const active = total - deleted;
+
+            document.getElementById(`${type}Total`).innerText = total;
+            document.getElementById(`${type}Active`).innerText = active;
+            document.getElementById(`${type}Deleted`).innerText = deleted;
+        }
+
+        // INIT
+        window.onload = () => {
+            fetchPosts();
+            fetchComments();
+        };
+
+    </script>
+</body>
+</html>
